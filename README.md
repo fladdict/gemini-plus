@@ -1,6 +1,6 @@
 # Gemini+ Chrome Extension
 
-Gemini AIと連携するChrome拡張機能です。選択したテキストやWebページをGeminiで処理できます。
+右クリックから色々geminiを使えるパワフルなChrome拡張機能です。選択したテキストやWebページをGeminiで処理できます。
 
 ## 概要
 
