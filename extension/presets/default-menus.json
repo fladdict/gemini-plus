@@ -1,0 +1,58 @@
+[
+  {
+    "id": "preset-folder",
+    "type": "folder",
+    "name": "プリセット",
+    "description": "事前定義されたメニュー",
+    "expanded": true,
+    "items": [
+      {
+        "id": "preset-summary",
+        "type": "menu",
+        "title": "サマリ",
+        "prompt": "以下のページをサマリしてください：\\n\\nタイトル: {$TITLE}\\nURL: {$URL}\\n\\nページの内容をサマリしてください。",
+        "context": "both"
+      },
+      {
+        "id": "preset-translate",
+        "type": "menu",
+        "title": "翻訳",
+        "prompt": "以下のページを日本語に翻訳してください：\\n\\nタイトル: {$TITLE}\\nURL: {$URL}\\n\\nページの内容を日本語に翻訳してください。",
+        "context": "both"
+      },
+      {
+        "id": "preset-faq",
+        "type": "menu",
+        "title": "FAQ作成",
+        "prompt": "以下のページについてFAQ（よくある質問と回答）を作成してください：\\n\\nタイトル: {$TITLE}\\nURL: {$URL}\\n\\nこのページの内容に基づいて、想定される質問とその回答を5-10個作成してください。",
+        "context": "both"
+      },
+      {
+        "id": "preset-factcheck",
+        "type": "menu",
+        "title": "ファクトチェック",
+        "prompt": "以下のページの内容についてファクトチェックを実施してください：\\n\\nタイトル: {$TITLE}\\nURL: {$URL}\\n\\nこのページに記載されている情報の正確性を検証し、疑問点があれば指摘してください。信頼できる情報源も併せて提示してください。",
+        "context": "both"
+      },
+      {
+        "id": "separator-1",
+        "type": "separator"
+      },
+      {
+        "id": "preset-analyze",
+        "type": "menu",
+        "title": "ページを分析",
+        "prompt": "以下のページを詳細に分析してください：\\n\\nタイトル: {$TITLE}\\nURL: {$URL}\\n\\n内容:\\n{$TEXT}\\n\\nこのページの構造、内容、目的を分析し、要点をまとめてください。",
+        "context": "page"
+      }
+    ]
+  },
+  {
+    "id": "custom-folder",
+    "type": "folder",
+    "name": "カスタム",
+    "description": "ユーザー定義のメニュー",
+    "expanded": true,
+    "items": []
+  }
+]

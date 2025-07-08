@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      width: 600px;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      position: relative;
+    }
+    
+    .header h1 {
+      font-size: 18px;
+      color: #333;
+      margin: 0;
+    }
+    
+    .header-menu {
+      position: relative;
+    }
+    
+    .menu-toggle {
+      background: none;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 4px;
+      color: #666;
+    }
+    
+    .menu-toggle:hover {
+      background-color: #f0f0f0;
+    }
+    
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      z-index: 1000;
+      min-width: 160px;
+    }
+    
+    .dropdown-item {
+      display: block;
+      width: 100%;
+      padding: 8px 12px;
+      border: none;
+      background: none;
+      text-align: left;
+      cursor: pointer;
+      font-size: 14px;
+      color: #333;
+    }
+    
+    .dropdown-item:hover {
+      background-color: #f5f5f5;
+    }
+    
+    .content {
+      margin-bottom: 20px;
+    }
+    
+    .setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 10px 0;
+    }
+    
+    .setting-label {
+      font-size: 14px;
+      color: #555;
+    }
+    
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+    
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 24px;
+    }
+    
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .slider {
+      background-color: #2196F3;
+    }
+    
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+    
+    .button {
+      width: 100%;
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    .button:hover {
+      background-color: #45a049;
+    }
+    
+    
+    .tab-content {
+      min-height: 200px;
+    }
+    
+    .custom-menu-section h3 {
+      margin-top: 0;
+      color: #333;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 14px;
+      color: #555;
+    }
+    
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    
+    .form-group textarea {
+      resize: vertical;
+    }
+    
+    .menu-list {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+    }
+    
+    .menu-list h4 {
+      margin-top: 0;
+      color: #333;
+    }
+    
+    .menu-item {
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    
+    .menu-item-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    
+    .menu-item-prompt {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 5px;
+    }
+    
+    .menu-item-context {
+      font-size: 11px;
+      color: #999;
+      margin-bottom: 5px;
+    }
+    
+    .menu-item-actions {
+      text-align: right;
+    }
+    
+    .delete-button {
+      background-color: #f44336;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    
+    .delete-button:hover {
+      background-color: #d32f2f;
+    }
+    
+    .template-help {
+      background-color: #f0f8ff;
+      border: 1px solid #b0d4f1;
+      border-radius: 4px;
+      padding: 8px;
+      margin-top: 5px;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    
+    .template-help code {
+      background-color: #e1f5fe;
+      padding: 2px 4px;
+      border-radius: 2px;
+      font-family: monospace;
+      font-size: 11px;
+    }
+    
+    .template-examples {
+      margin-bottom: 15px;
+    }
+    
+    .template-examples label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #555;
+    }
+    
+    .template-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .template-btn {
+      background-color: #e3f2fd;
+      border: 1px solid #90caf9;
+      border-radius: 4px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-size: 12px;
+      color: #1976d2;
+      transition: background-color 0.2s;
+    }
+    
+    .template-btn:hover {
+      background-color: #bbdefb;
+    }
+    
+    
+    .menu-manager {
+      display: flex;
+      gap: 20px;
+      min-height: 400px;
+    }
+    
+    .tree-panel {
+      flex: 1;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 10px;
+      background-color: #fafafa;
+    }
+    
+    .editor-panel {
+      flex: 2;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 15px;
+      background-color: white;
+    }
+    
+    .tree-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    .tree-header h4 {
+      margin: 0;
+      color: #333;
+    }
+    
+    .tree-actions {
+      display: flex;
+      gap: 5px;
+    }
+    
+    .tree-btn {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 11px;
+    }
+    
+    .tree-btn.folder {
+      background-color: #ff9800;
+    }
+    
+    .tree-btn.separator {
+      background-color: #9e9e9e;
+    }
+    
+    .tree-btn:hover {
+      opacity: 0.8;
+    }
+    
+    .tree-list {
+      max-height: 350px;
+      overflow-y: auto;
+    }
+    
+    .tree-item {
+      display: flex;
+      align-items: center;
+      padding: 6px 8px;
+      margin: 2px 0;
+      border-radius: 3px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s ease;
+    }
+    
+    .tree-item.dragging {
+      opacity: 0.5;
+    }
+    
+    .tree-item.drag-over {
+      background-color: #bbdefb;
+      border: 2px dashed #2196f3;
+    }
+    
+    .tree-item:hover {
+      background-color: #e3f2fd;
+    }
+    
+    .tree-item.selected {
+      background-color: #2196f3;
+      color: white;
+    }
+    
+    .tree-item.folder {
+      font-weight: bold;
+    }
+    
+    .tree-item.menu-item {
+      margin-left: 20px;
+      border-left: 2px solid #ddd;
+      padding-left: 10px;
+    }
+    
+    .tree-item.separator {
+      height: 20px;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+    }
+    
+    .tree-item.separator .separator-line {
+      flex: 1;
+      height: 1px;
+      background-color: #ccc;
+      margin: 0 10px;
+    }
+    
+    .tree-icon {
+      margin-right: 6px;
+      font-size: 12px;
+    }
+    
+    .tree-toggle {
+      margin-right: 4px;
+      cursor: pointer;
+      font-size: 10px;
+      color: #666;
+    }
+    
+    .editor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    .editor-title {
+      margin: 0;
+      color: #333;
+    }
+    
+    .editor-actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .editor-btn {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    
+    .editor-btn.save {
+      background-color: #4CAF50;
+      color: white;
+    }
+    
+    .editor-btn.cancel {
+      background-color: #f44336;
+      color: white;
+    }
+    
+    .editor-btn.delete {
+      background-color: #ff5722;
+      color: white;
+      margin-left: auto;
+    }
+    
+    .editor-btn:hover {
+      opacity: 0.8;
+    }
+    
+    .editor-btn:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    
+    .editor-content {
+      display: none;
+    }
+    
+    .editor-content.active {
+      display: block;
+    }
+    
+    .no-selection {
+      text-align: center;
+      color: #666;
+      padding: 60px 20px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Gemini+ メニュー設定</h1>
+    <div class="header-menu">
+      <button class="menu-toggle" id="menuToggle">⋯</button>
+      <div class="dropdown-menu" id="dropdownMenu" style="display: none;">
+        <button class="dropdown-item" id="restoreMenusBtn">初期メニューを復元</button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="tab-content" id="custom-tab">
+    <div class="menu-manager">
+      <!-- Left Panel: Tree View -->
+      <div class="tree-panel">
+        <div class="tree-header">
+          <h4>メニュー一覧</h4>
+          <div class="tree-actions">
+            <button class="tree-btn folder" id="addFolderBtn">📁 フォルダ</button>
+            <button class="tree-btn" id="addMenuBtn">➕ メニュー</button>
+            <button class="tree-btn separator" id="addSeparatorBtn">➖ 分割線</button>
+          </div>
+        </div>
+        <div class="tree-list" id="treeList">
+          <!-- Tree items will be populated here -->
+        </div>
+      </div>
+      
+      <!-- Right Panel: Editor -->
+      <div class="editor-panel">
+        <div class="editor-header">
+          <h4 class="editor-title" id="editorTitle">メニューエディター</h4>
+          <div class="editor-actions">
+            <button class="editor-btn save" id="saveBtn" disabled>保存</button>
+            <button class="editor-btn cancel" id="cancelBtn" disabled>キャンセル</button>
+            <button class="editor-btn delete" id="deleteBtn" style="display: none;">削除</button>
+          </div>
+        </div>
+        
+        <!-- No Selection State -->
+        <div class="no-selection" id="noSelection">
+          左のツリーからメニューを選択するか、<br>
+          新しいメニューを作成してください
+        </div>
+        
+        <!-- Menu Editor Content -->
+        <div class="editor-content" id="menuEditor">
+          <div class="form-group">
+            <label for="editMenuTitle">メニュータイトル:</label>
+            <input type="text" id="editMenuTitle" placeholder="例: 文章校正">
+          </div>
+          
+          <div class="form-group">
+            <label for="editMenuPrompt">プロンプトテンプレート:</label>
+            <textarea id="editMenuPrompt" rows="4" placeholder="例: 以下のテキストを校正してください：&#10;&#10;{$TEXT}"></textarea>
+            <div class="template-help">
+              <strong>利用可能な変数:</strong><br>
+              <code>{$URL}</code> - ページのURL<br>
+              <code>{$TITLE}</code> - ページのタイトル<br>
+              <code>{$TEXT}</code> - 選択テキスト または ページ全文
+            </div>
+          </div>
+          
+          <div class="template-examples">
+            <label>テンプレート例:</label>
+            <div class="template-buttons">
+              <button type="button" class="template-btn" data-template="summary">要約</button>
+              <button type="button" class="template-btn" data-template="translate">翻訳</button>
+              <button type="button" class="template-btn" data-template="proofread">校正</button>
+              <button type="button" class="template-btn" data-template="explain">解説</button>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="editMenuContext">適用範囲:</label>
+            <select id="editMenuContext">
+              <option value="both">ページ全体と選択範囲</option>
+              <option value="page">ページ全体のみ</option>
+              <option value="selection">選択範囲のみ</option>
+            </select>
+          </div>
+          
+        </div>
+        
+        <!-- Folder Editor Content -->
+        <div class="editor-content" id="folderEditor">
+          <div class="form-group">
+            <label for="editFolderName">フォルダ名:</label>
+            <input type="text" id="editFolderName" placeholder="例: テキスト処理">
+          </div>
+          
+          <div class="form-group">
+            <label for="editFolderDescription">説明（オプション）:</label>
+            <textarea id="editFolderDescription" rows="2" placeholder="このフォルダの説明を入力してください"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  
+  <script src="popup.js"></script>
+</body>
+</html>
