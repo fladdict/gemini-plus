@@ -27,7 +27,6 @@ document.addEventListener('DOMContentLoaded', function() {
   // Editor form elements
   const editMenuTitle = document.getElementById('editMenuTitle');
   const editMenuPrompt = document.getElementById('editMenuPrompt');
-  const editMenuContext = document.getElementById('editMenuContext');
   const editFolderName = document.getElementById('editFolderName');
   const editFolderDescription = document.getElementById('editFolderDescription');
   
@@ -59,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
     },
     explain: {
       title: '内容解説',
-      prompt: '以下のテキストについて、分かりやすく解説してください：\n\nページタイトル: {$TITLE}\nURL: {$URL}\n\n内容:\n{$TEXT}'
+      prompt: '以下のテキストについて、分かりやすく解説してください：\n\n{$TEXT}'
     }
   };
   
@@ -446,7 +445,6 @@ document.addEventListener('DOMContentLoaded', function() {
       editorTitle.textContent = `メニュー: ${item.title}`;
       editMenuTitle.value = item.title || '';
       editMenuPrompt.value = item.prompt || '';
-      editMenuContext.value = item.context || 'both';
       menuEditor.classList.add('active');
     }
     
@@ -489,8 +487,7 @@ document.addEventListener('DOMContentLoaded', function() {
       return {
         ...selectedItem,
         title: editMenuTitle.value,
-        prompt: editMenuPrompt.value,
-        context: editMenuContext.value
+        prompt: editMenuPrompt.value
       };
     }
   }
@@ -529,7 +526,6 @@ document.addEventListener('DOMContentLoaded', function() {
   editMenuPrompt.addEventListener('input', () => {
     updateEditorButtons();
   });
-  editMenuContext.addEventListener('change', updateEditorButtons);
   editFolderName.addEventListener('input', updateEditorButtons);
   editFolderDescription.addEventListener('input', updateEditorButtons);
   
@@ -542,7 +538,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (template) {
         editMenuTitle.value = template.title;
         editMenuPrompt.value = template.prompt;
-          updateEditorButtons();
+        updateEditorButtons();
       }
     });
   });
@@ -594,8 +590,7 @@ document.addEventListener('DOMContentLoaded', function() {
       id: 'menu-' + Date.now(),
       type: 'menu',
       title: '新しいメニュー',
-      prompt: '{$TEXT}',
-      context: 'both'
+      prompt: '{$TEXT}'
     };
     
     // Ensure folder has items array
@@ -712,8 +707,7 @@ document.addEventListener('DOMContentLoaded', function() {
           menus.push({
             id: item.id,
             title: item.title,
-            prompt: item.prompt,
-            context: item.context
+            prompt: item.prompt
           });
         } else if (item.type === 'folder' && item.items) {
           extractFromItems(item.items);

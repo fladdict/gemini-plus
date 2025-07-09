@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>CSV Manager Tests</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .test-header {
+      background-color: #f5f5f5;
+      padding: 20px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+    
+    .test-controls {
+      margin-bottom: 20px;
+    }
+    
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    
+    .run-btn {
+      background-color: #4CAF50;
+      color: white;
+    }
+    
+    .clear-btn {
+      background-color: #f44336;
+      color: white;
+    }
+    
+    .test-output {
+      background-color: #000;
+      color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      font-family: monospace;
+      font-size: 14px;
+      white-space: pre-wrap;
+      max-height: 600px;
+      overflow-y: auto;
+    }
+    
+    .passed {
+      color: #4CAF50;
+    }
+    
+    .failed {
+      color: #f44336;
+    }
+    
+    .warning {
+      color: #ff9800;
+    }
+    
+    .info {
+      color: #2196F3;
+    }
+  </style>
+</head>
+<body>
+  <div class="test-header">
+    <h1>CSV Manager Unit Tests</h1>
+    <p>このページはGemini+ Chrome拡張機能のCSV機能をテストします。</p>
+  </div>
+  
+  <div class="test-controls">
+    <button class="run-btn" onclick="runTests()">テストを実行</button>
+    <button class="clear-btn" onclick="clearOutput()">出力をクリア</button>
+  </div>
+  
+  <div id="test-output" class="test-output">
+    テストを実行するには「テストを実行」ボタンをクリックしてください。
+  </div>
+
+  <!-- 必要なスクリプトを読み込み -->
+  <script src="../extension/csv-manager.js"></script>
+  <script src="test-framework.js"></script>
+  <script src="test-data.js"></script>
+  <script src="csv-manager.test.js"></script>
+  <script src="context-menu-test.js"></script>
+  
+  <script>
+    let originalConsole = {};
+    
+    function captureConsole() {
+      const output = document.getElementById('test-output');
+      
+      // 元のconsoleメソッドを保存
+      originalConsole.log = console.log;
+      originalConsole.error = console.error;
+      originalConsole.warn = console.warn;
+      
+      // console.logを上書き
+      console.log = function(...args) {
+        const message = args.join(' ');
+        output.textContent += message + '\n';
+        output.scrollTop = output.scrollHeight;
+        
+        // 元のconsole.logも呼び出す
+        originalConsole.log.apply(console, args);
+      };
+      
+      // console.errorを上書き
+      console.error = function(...args) {
+        const message = args.join(' ');
+        output.innerHTML += `<span class="failed">${escapeHtml(message)}</span>\n`;
+        output.scrollTop = output.scrollHeight;
+        
+        // 元のconsole.errorも呼び出す
+        originalConsole.error.apply(console, args);
+      };
+      
+      // console.warnを上書き
+      console.warn = function(...args) {
+        const message = args.join(' ');
+        output.innerHTML += `<span class="warning">${escapeHtml(message)}</span>\n`;
+        output.scrollTop = output.scrollHeight;
+        
+        // 元のconsole.warnも呼び出す
+        originalConsole.warn.apply(console, args);
+      };
+    }
+    
+    function restoreConsole() {
+      console.log = originalConsole.log;
+      console.error = originalConsole.error;
+      console.warn = originalConsole.warn;
+    }
+    
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    function colorizeOutput() {
+      const output = document.getElementById('test-output');
+      let html = output.innerHTML;
+      
+      // 成功したテストを緑色に
+      html = html.replace(/✅/g, '<span class="passed">✅</span>');
+      
+      // 失敗したテストを赤色に
+      html = html.replace(/❌/g, '<span class="failed">❌</span>');
+      
+      // 警告を黄色に
+      html = html.replace(/⚠️/g, '<span class="warning">⚠️</span>');
+      
+      // 情報を青色に
+      html = html.replace(/ℹ️/g, '<span class="info">ℹ️</span>');
+      
+      // セクションヘッダーを強調
+      html = html.replace(/=== (.+) ===/g, '<span class="info">=== $1 ===</span>');
+      
+      output.innerHTML = html;
+    }
+    
+    function runTests() {
+      const output = document.getElementById('test-output');
+      output.textContent = '';
+      
+      // consoleをキャプチャ
+      captureConsole();
+      
+      try {
+        // テストを実行
+        const csvSuccess = runCSVManagerTests();
+        const contextSuccess = runContextMenuTests();
+        
+        const overallSuccess = csvSuccess && contextSuccess;
+        
+        // 結果に基づいて色分け
+        setTimeout(() => {
+          colorizeOutput();
+          
+          if (overallSuccess) {
+            output.innerHTML += '\n<span class="passed">🎉 すべてのテストが成功しました！</span>';
+          } else {
+            output.innerHTML += '\n<span class="failed">💥 いくつかのテストが失敗しました</span>';
+          }
+        }, 100);
+        
+      } catch (error) {
+        output.innerHTML += `<span class="failed">テスト実行中にエラーが発生しました: ${escapeHtml(error.message)}</span>\n`;
+        if (error.stack) {
+          output.innerHTML += `<span class="failed">スタックトレース: ${escapeHtml(error.stack)}</span>\n`;
+        }
+      } finally {
+        // consoleを復元
+        restoreConsole();
+      }
+    }
+    
+    function clearOutput() {
+      document.getElementById('test-output').textContent = 'テストを実行するには「テストを実行」ボタンをクリックしてください。';
+    }
+    
+    // ページ読み込み時に初期化
+    window.addEventListener('load', function() {
+      console.log('Test runner loaded. Ready to run tests.');
+    });
+  </script>
+</body>
+</html>

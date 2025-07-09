@@ -23,6 +23,12 @@ gemini-plus/
 │   ├── 基本設計.md
 │   ├── 新規カスタムメニューの仕様.md
 │   └── CSV機能の使用方法.md
+├── tests/            # テストスイート
+│   ├── README.md
+│   ├── test-framework.js
+│   ├── test-data.js
+│   ├── csv-manager.test.js
+│   └── test-runner.html
 └── extension/         # Chrome拡張機能本体
     ├── manifest.json  # 拡張機能の設定ファイル
     ├── background.js  # Service Worker（バックグラウンド処理）
@@ -86,6 +92,15 @@ gemini-plus/
 - 拡張機能の変更後は「再読み込み」が必要
 - `extension`フォルダ内のファイルのみが拡張機能に含まれる
 - ルートフォルダには開発用ファイルを配置
+
+### テストの実行
+CSV機能の堅牢性を確認するためのテストスイートを用意しています：
+
+1. `tests/test-runner.html` をブラウザで開く
+2. 「テストを実行」ボタンをクリック
+3. テスト結果を確認
+
+詳細は `tests/README.md` を参照してください。
 
 ## カスタマイズ
 

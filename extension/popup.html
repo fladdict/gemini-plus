@@ -547,11 +547,10 @@
             <textarea id="editMenuPrompt" rows="4" placeholder="例: 以下のテキストを校正してください：&#10;&#10;{$TEXT}"></textarea>
             <div class="template-help">
               <strong>利用可能な変数:</strong><br>
-              <code>{$URL}</code> - ページのURL<br>
-              <code>{$TITLE}</code> - ページのタイトル<br>
-              <code>{$TEXT}</code> - 選択テキスト または ページ全文
+              <code>{$TEXT}</code> - 選択されたテキスト
             </div>
           </div>
+          
           
           <div class="template-examples">
             <label>テンプレート例:</label>
@@ -563,14 +562,6 @@
             </div>
           </div>
           
-          <div class="form-group">
-            <label for="editMenuContext">適用範囲:</label>
-            <select id="editMenuContext">
-              <option value="both">ページ全体と選択範囲</option>
-              <option value="page">ページ全体のみ</option>
-              <option value="selection">選択範囲のみ</option>
-            </select>
-          </div>
           
         </div>
         

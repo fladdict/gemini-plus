@@ -64,7 +64,7 @@ function createContextMenus() {
     chrome.contextMenus.create({
       id: 'gemini-plus-menu',
       title: 'Gemini+',
-      contexts: ['selection', 'page']
+      contexts: ['selection']
     });
     
     // Load menu structure from storage and create menus
@@ -79,14 +79,14 @@ function createContextMenus() {
         id: 'gemini-plus-separator',
         parentId: 'gemini-plus-menu',
         type: 'separator',
-        contexts: ['selection', 'page']
+        contexts: ['selection']
       });
       
       chrome.contextMenus.create({
         id: 'gemini-plus-customize',
         parentId: 'gemini-plus-menu',
         title: 'カスタマイズ',
-        contexts: ['selection', 'page']
+        contexts: ['selection']
       });
     });
   });
@@ -100,35 +100,23 @@ function createMenusFromStructure(items, parentId) {
         id: item.id,
         parentId: parentId,
         type: 'separator',
-        contexts: ['selection', 'page']
+        contexts: ['selection']
       });
     } else if (item.type === 'menu') {
-      // Create menu for page context
-      if (item.context === 'both' || item.context === 'page') {
-        chrome.contextMenus.create({
-          id: item.id,
-          parentId: parentId,
-          title: item.title,
-          contexts: ['page']
-        });
-      }
-      
-      // Create menu for selection context
-      if (item.context === 'both' || item.context === 'selection') {
-        chrome.contextMenus.create({
-          id: item.id + '-selection',
-          parentId: parentId,
-          title: item.title + ' (選択範囲)',
-          contexts: ['selection']
-        });
-      }
+      // Create menu for selection context only
+      chrome.contextMenus.create({
+        id: item.id,
+        parentId: parentId,
+        title: item.title,
+        contexts: ['selection']
+      });
     } else if (item.type === 'folder' && item.items && item.items.length > 0) {
       // Create folder as submenu
       chrome.contextMenus.create({
         id: item.id,
         parentId: parentId,
         title: item.name,
-        contexts: ['selection', 'page']
+        contexts: ['selection']
       });
       
       // Recursively create items within the folder
@@ -225,20 +213,11 @@ function handleMenuClick(info, tab) {
     if (!result.menuStructure) return;
     
     // Find the clicked menu in the tree structure
-    let targetMenu = null;
-    let isSelection = false;
-    
-    // Check if it's a selection menu (ends with '-selection')
-    if (menuId.endsWith('-selection')) {
-      const baseId = menuId.replace('-selection', '');
-      targetMenu = findMenuInStructure(result.menuStructure, baseId);
-      isSelection = true;
-    } else {
-      targetMenu = findMenuInStructure(result.menuStructure, menuId);
-    }
+    const targetMenu = findMenuInStructure(result.menuStructure, menuId);
     
     if (targetMenu) {
-      handleMenuPrompt(targetMenu, tab, isSelection ? info.selectionText : null);
+      // All menus now work with selection only
+      handleMenuPrompt(targetMenu, tab, info.selectionText || '');
     }
   });
 }
@@ -257,29 +236,19 @@ function findMenuInStructure(items, targetId) {
   return null;
 }
 
-// Handle menu prompt (unified for preset and custom)
+// Handle menu prompt (selection only)
 function handleMenuPrompt(menu, tab, selectionText) {
-  console.log('Executing menu prompt:', menu.title);
+  console.log('Executing menu prompt:', menu.title, 'selectionText:', selectionText ? 'present' : 'empty');
   
   chrome.tabs.sendMessage(tab.id, {
     action: 'showNotification',
     message: 'Geminiを開いています...'
   });
   
-  // Get page content for {$TEXT} when no selection
-  if (!selectionText) {
-    // Send message to content script to get page text
-    chrome.tabs.sendMessage(tab.id, {
-      action: 'getPageText'
-    }, (response) => {
-      const pageText = response ? response.text : '';
-      const processedPrompt = processPromptTemplate(menu.prompt, tab, selectionText || pageText);
-      openGeminiWithPrompt(processedPrompt);
-    });
-  } else {
-    const processedPrompt = processPromptTemplate(menu.prompt, tab, selectionText);
-    openGeminiWithPrompt(processedPrompt);
-  }
+  // All menus now work with selection only
+  const textToUse = selectionText || '';
+  const processedPrompt = processPromptTemplate(menu.prompt, tab, textToUse);
+  openGeminiWithPrompt(processedPrompt);
 }
 
 // Process prompt template with variable substitution
