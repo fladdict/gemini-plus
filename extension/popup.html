@@ -495,6 +495,8 @@
       <button class="menu-toggle" id="menuToggle">⋯</button>
       <div class="dropdown-menu" id="dropdownMenu" style="display: none;">
         <button class="dropdown-item" id="restoreMenusBtn">初期メニューを復元</button>
+        <button class="dropdown-item" id="exportCSVBtn">CSVエクスポート</button>
+        <button class="dropdown-item" id="importCSVBtn">CSVインポート</button>
       </div>
     </div>
   </div>
@@ -589,6 +591,10 @@
   </div>
   
   
+  <!-- Hidden file input for CSV import -->
+  <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
+  
+  <script src="csv-manager.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

@@ -7,6 +7,9 @@ document.addEventListener('DOMContentLoaded', function() {
   const menuToggle = document.getElementById('menuToggle');
   const dropdownMenu = document.getElementById('dropdownMenu');
   const restoreMenusBtn = document.getElementById('restoreMenusBtn');
+  const exportCSVBtn = document.getElementById('exportCSVBtn');
+  const importCSVBtn = document.getElementById('importCSVBtn');
+  const csvFileInput = document.getElementById('csvFileInput');
   
   // Tree and Editor functionality
   const treeList = document.getElementById('treeList');
@@ -36,6 +39,9 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Default menu structure (loaded from background script)
   let defaultMenuStructure = null;
+  
+  // CSV Manager instance
+  let csvManager = null;
 
   // Template examples
   const templates = {
@@ -76,6 +82,9 @@ document.addEventListener('DOMContentLoaded', function() {
       ];
     }
     
+    // Initialize CSV Manager
+    csvManager = new CSVManager();
+    
     // Load menu structure from storage
     chrome.storage.sync.get(['menuStructure'], function(result) {
       if (result.menuStructure) {
@@ -107,6 +116,66 @@ document.addEventListener('DOMContentLoaded', function() {
       restoreDefaultMenus();
       dropdownMenu.style.display = 'none';
     }
+  });
+  
+  // CSV Export functionality
+  exportCSVBtn.addEventListener('click', () => {
+    try {
+      const result = csvManager.exportToCSV(menuStructure);
+      if (result.success) {
+        showStatus(`${result.count}個のメニューをエクスポートしました`, '#4CAF50');
+        console.log('CSV exported:', result.filename);
+      }
+    } catch (error) {
+      showStatus('エクスポートに失敗しました: ' + error.message, '#f44336');
+      console.error('CSV export error:', error);
+    }
+    dropdownMenu.style.display = 'none';
+  });
+  
+  // CSV Import functionality
+  importCSVBtn.addEventListener('click', () => {
+    csvFileInput.click();
+    dropdownMenu.style.display = 'none';
+  });
+  
+  // File input change handler
+  csvFileInput.addEventListener('change', async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    try {
+      const importResult = await csvManager.importFromCSV(file);
+      
+      if (importResult.success) {
+        const integrationResult = csvManager.integrateMenus(
+          menuStructure, 
+          importResult.menus,
+          {
+            targetFolderName: 'インポート',
+            createNewFolder: true,
+            overwriteExisting: false
+          }
+        );
+        
+        if (integrationResult.success) {
+          renderTree();
+          saveStructure();
+          showStatus(`${integrationResult.count}個のメニューをインポートしました`, '#4CAF50');
+          console.log('CSV imported successfully:', integrationResult);
+        } else {
+          showStatus('インポートに失敗しました: ' + integrationResult.error, '#f44336');
+        }
+      } else {
+        showStatus('CSVファイルの読み込みに失敗しました: ' + importResult.error, '#f44336');
+      }
+    } catch (error) {
+      showStatus('インポートエラー: ' + error.message, '#f44336');
+      console.error('CSV import error:', error);
+    }
+    
+    // Reset file input
+    csvFileInput.value = '';
   });
   
   // Function to restore default menus
